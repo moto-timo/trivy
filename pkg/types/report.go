@@ -97,6 +97,7 @@ const (
 	FormatCycloneDX  Format = "cyclonedx"
 	FormatSPDX       Format = "spdx"
 	FormatSPDXJSON   Format = "spdx-json"
+	FormatSPDX3JSON  Format = "spdx3-json"
 	FormatGitHub     Format = "github"
 	FormatCosignVuln Format = "cosign-vuln"
 )
@@ -119,6 +120,7 @@ var (
 		FormatCycloneDX,
 		FormatSPDX,
 		FormatSPDXJSON,
+		FormatSPDX3JSON,
 		FormatGitHub,
 		FormatCosignVuln,
 	}
@@ -126,6 +128,7 @@ var (
 		FormatCycloneDX,
 		FormatSPDX,
 		FormatSPDXJSON,
+		FormatSPDX3JSON,
 		FormatGitHub,
 	}
 	SupportedCompliances = []string{
