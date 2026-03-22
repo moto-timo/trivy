@@ -80,7 +80,7 @@ func (a Artifact) Inspect(ctx context.Context) (artifact.Reference, error) {
 	case sbom.FormatCycloneDXJSON, sbom.FormatCycloneDXXML, sbom.FormatAttestCycloneDXJSON,
 		sbom.FormatLegacyCosignAttestCycloneDXJSON, sbom.FormatSigstoreBundleCycloneDXJSON:
 		artifactType = types.TypeCycloneDX
-	case sbom.FormatSPDXTV, sbom.FormatSPDXJSON, sbom.FormatAttestSPDXJSON, sbom.FormatSigstoreBundleSPDXJSON:
+	case sbom.FormatSPDXTV, sbom.FormatSPDXJSON, sbom.FormatSPDX3JSON, sbom.FormatAttestSPDXJSON, sbom.FormatSigstoreBundleSPDXJSON:
 		artifactType = types.TypeSPDX
 	}
 

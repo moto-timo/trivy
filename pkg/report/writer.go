@@ -17,6 +17,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/report/github"
 	"github.com/aquasecurity/trivy/pkg/report/predicate"
 	"github.com/aquasecurity/trivy/pkg/report/spdx"
+	reportspdx3 "github.com/aquasecurity/trivy/pkg/report/spdx3"
 	"github.com/aquasecurity/trivy/pkg/report/table"
 	"github.com/aquasecurity/trivy/pkg/types"
 )
@@ -77,6 +78,8 @@ func Write(ctx context.Context, report types.Report, option flag.Options) (err e
 	case types.FormatCycloneDX:
 		// TODO: support xml format option with cyclonedx writer
 		writer = cyclonedx.NewWriter(output, option.AppVersion)
+	case types.FormatSPDX3JSON:
+		writer = reportspdx3.NewWriter(output, option.AppVersion)
 	case types.FormatSPDX, types.FormatSPDXJSON:
 		writer = spdx.NewWriter(output, option.AppVersion, option.Format)
 	case types.FormatTemplate:

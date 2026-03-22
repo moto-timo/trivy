@@ -16,6 +16,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/sbom/cyclonedx"
 	sbomio "github.com/aquasecurity/trivy/pkg/sbom/io"
 	"github.com/aquasecurity/trivy/pkg/sbom/spdx"
+	"github.com/aquasecurity/trivy/pkg/sbom/spdx3"
 	"github.com/aquasecurity/trivy/pkg/types"
 )
 
@@ -27,6 +28,7 @@ const (
 	FormatSPDXJSON            Format = "spdx-json"
 	FormatSPDXTV              Format = "spdx-tv"
 	FormatSPDXXML             Format = "spdx-xml"
+	FormatSPDX3JSON           Format = "spdx3-json"
 	FormatAttestCycloneDXJSON Format = "attest-cyclonedx-json"
 	FormatAttestSPDXJSON      Format = "attest-spdx-json"
 	FormatUnknown             Format = "unknown"
@@ -66,6 +68,17 @@ type cdxHeader struct {
 
 type spdxHeader struct {
 	SpdxID string `json:"SPDXID"`
+}
+
+// spdx3Header is used to detect SPDX 3.0 JSON-LD documents.
+// tools-golang serializes as {"@context": "...", "@graph": [...]},
+// so we check for @context containing "spdx" with either @graph present
+// or @type=SpdxDocument (for non-graph form).
+type spdx3Header struct {
+	Context     string          `json:"@context"`
+	Type        string          `json:"@type"`
+	Graph       json.RawMessage `json:"@graph"`
+	SpecVersion string          `json:"specVersion"`
 }
 
 // sigstoreBundle represents the structure of a Sigstore bundle
@@ -116,6 +129,29 @@ func IsSPDXJSON(r io.ReadSeeker) (bool, error) {
 	return false, nil
 }
 
+func IsSPDX3JSON(r io.ReadSeeker) (bool, error) {
+	if _, err := r.Seek(0, io.SeekStart); err != nil {
+		return false, xerrors.Errorf("seek error: %w", err)
+	}
+
+	var header spdx3Header
+	if err := json.NewDecoder(r).Decode(&header); err == nil {
+		// tools-golang @graph format: {"@context": "...spdx...", "@graph": [...]}
+		if strings.Contains(header.Context, "spdx") && len(header.Graph) > 0 {
+			return true, nil
+		}
+		// Non-graph form: {"@context": "...spdx...", "@type": "SpdxDocument", ...}
+		if strings.Contains(header.Context, "spdx") && header.Type == "SpdxDocument" {
+			return true, nil
+		}
+		// Also detect by specVersion starting with "3."
+		if strings.HasPrefix(header.SpecVersion, "3.") {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func IsSPDXTV(r io.ReadSeeker) (bool, error) {
 	if _, err := r.Seek(0, io.SeekStart); err != nil {
 		return false, xerrors.Errorf("seek error: %w", err)
@@ -145,6 +181,13 @@ func DetectFormat(r io.ReadSeeker) (Format, error) {
 		return FormatUnknown, err
 	} else if ok {
 		return FormatCycloneDXXML, nil
+	}
+
+	// Try SPDX 3.0 JSON-LD (must come before SPDX 2.x JSON detection)
+	if ok, err := IsSPDX3JSON(r); err != nil {
+		return FormatUnknown, err
+	} else if ok {
+		return FormatSPDX3JSON, nil
 	}
 
 	// Try SPDX json
@@ -318,6 +361,10 @@ func Decode(ctx context.Context, f io.Reader, format Format) (types.SBOM, error)
 				Predicate: &spdx.SPDX{BOM: bom},
 			},
 		}
+		decoder = json.NewDecoder(f)
+	case FormatSPDX3JSON:
+		bom = core.NewBOM(core.Options{})
+		v = &spdx3.SPDX3{BOM: bom}
 		decoder = json.NewDecoder(f)
 	case FormatSPDXJSON:
 		bom = core.NewBOM(core.Options{})

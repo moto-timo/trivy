@@ -297,6 +297,7 @@ func (e *Encoder) encodePackages(parent *core.Component, result types.Result) {
 //
 // For SBOM scanning (case 1), this approach is CycloneDX-specific
 // because: SPDX 2.3 does not include vulnerabilities in the SBOM specification.
+// Note: SPDX 3.0 supports vulnerabilities via the Security profile.
 // Therefore, the method uses BOM-Ref for component-vulnerability lookup rather than SPDX-ID.
 func (e *Encoder) reuseExistingBOM(report types.Report) (*core.BOM, error) {
 	bom := report.BOM.Clone()
