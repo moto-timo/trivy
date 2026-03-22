@@ -1,0 +1,100 @@
+{
+  "@context": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+  "@type": "SpdxDocument",
+  "spdxId": "https://trivy.dev/container_image/rails-latest-12345678",
+  "name": "rails:latest",
+  "specVersion": "3.0.1",
+  "creationInfo": {
+    "specVersion": "3.0.1",
+    "created": "2024-01-15T10:30:00Z",
+    "createdBy": [
+      {
+        "@type": "Organization",
+        "name": "aquasecurity"
+      }
+    ],
+    "createdUsing": [
+      {
+        "@type": "Tool",
+        "name": "trivy-0.56.2"
+      }
+    ]
+  },
+  "profileConformance": ["core", "software", "security"],
+  "rootElement": [
+    {
+      "@type": "software_Package",
+      "spdxId": "_:root-abc123",
+      "name": "rails:latest",
+      "software_primaryPurpose": "container",
+      "software_copyrightText": "NOASSERTION"
+    }
+  ],
+  "element": [
+    {
+      "@type": "software_Package",
+      "spdxId": "_:pkg-openssl",
+      "name": "openssl",
+      "software_packageVersion": "1.1.1k-1",
+      "software_primaryPurpose": "library",
+      "software_packageUrl": "pkg:deb/debian/openssl@1.1.1k-1",
+      "software_copyrightText": "NOASSERTION",
+      "externalIdentifier": [
+        {
+          "@type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:deb/debian/openssl@1.1.1k-1"
+        }
+      ],
+      "software_declaredLicense": {
+        "@type": "simplelicensing_LicenseExpression",
+        "simplelicensing_licenseExpression": "OpenSSL"
+      },
+      "verifiedUsing": [
+        {
+          "@type": "Hash",
+          "algorithm": "sha256",
+          "hashValue": "abc123def456"
+        }
+      ]
+    },
+    {
+      "@type": "Relationship",
+      "spdxId": "_:describes-root",
+      "from": "https://trivy.dev/container_image/rails-latest-12345678",
+      "to": ["_:root-abc123"],
+      "relationshipType": "describes"
+    },
+    {
+      "@type": "Relationship",
+      "spdxId": "_:contains-root-openssl",
+      "from": "_:root-abc123",
+      "to": ["_:pkg-openssl"],
+      "relationshipType": "contains"
+    },
+    {
+      "@type": "security_Vulnerability",
+      "spdxId": "_:vuln-CVE-2021-3711",
+      "name": "CVE-2021-3711",
+      "summary": "CVE-2021-3711",
+      "externalRef": [
+        {
+          "@type": "ExternalRef",
+          "externalRefType": "securityAdvisory",
+          "locator": ["https://avd.aquasec.com/nvd/cve-2021-3711"]
+        }
+      ]
+    },
+    {
+      "@type": "security_VexAffectedVulnAssessmentRelationship",
+      "spdxId": "_:vex-CVE-2021-3711-openssl",
+      "name": "VEX: CVE-2021-3711 affects openssl",
+      "from": "_:vuln-CVE-2021-3711",
+      "to": ["_:pkg-openssl"],
+      "relationshipType": "affects",
+      "security_assessedElement": "_:pkg-openssl",
+      "security_actionStatement": "Upgrade openssl to version 1.1.1l-1",
+      "security_statusNotes": "Installed version: 1.1.1k-1"
+    }
+  ]
+}
